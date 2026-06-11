@@ -1,0 +1,7 @@
+.azure/
+.bicep/
+.tmp/
+*.local.bicepparam
+*.whatif.json
+*.whatif.txt
+
