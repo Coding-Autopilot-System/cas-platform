@@ -3,7 +3,8 @@
 Production-oriented Azure infrastructure foundation for the Coding Autopilot
 System (CAS). It provides environment-isolated Container Apps hosting,
 workspace-based observability, system-assigned managed identity, budgets, and
-safe validation tooling without storing secrets.
+safe validation tooling without storing secrets. The workload module implements
+the public `cas-reference-product` deployment interface.
 
 ## v0.1 foundation
 
@@ -13,6 +14,8 @@ safe validation tooling without storing secrets.
 - Log Analytics, Application Insights, diagnostic settings, tags, and budgets.
 - Dev, test, and production parameter sets.
 - Local and CI validation plus a non-deploying Azure `what-if` script.
+- Reference-product configuration injection and liveness/readiness probes.
+- Optional Foundry project RBAC requiring an explicit project scope and role.
 
 ## Validate locally
 
@@ -40,6 +43,18 @@ az login
 The script only invokes `az deployment sub what-if`. It never invokes a create
 or deploy command.
 
+## Reference product configuration
+
+The Container App injects `ENVIRONMENT`, `WORKFLOW_BACKEND`,
+`FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME`, and
+`APPLICATIONINSIGHTS_CONNECTION_STRING`. Local mode is the safe default.
+Foundry mode requires a project endpoint and Next Gen agent name.
+
+Foundry RBAC is disabled unless both `foundryProjectResourceId` and
+`foundryRoleDefinitionResourceId` are explicitly supplied. The assignment is
+created only at that Foundry project resource. Select and approve the minimum
+role externally; the template does not assume a broad built-in role.
+
 ## Architecture
 
 See [architecture](docs/architecture.md), [threat model](docs/threat-model.md),
@@ -48,6 +63,7 @@ kept under `.planning/`.
 
 ## Security
 
-Public ingress is disabled by default. No secrets, credentials, connection
-strings, or access keys are accepted by the templates. Runtime access to future
-dependencies must use managed identity with narrowly scoped RBAC.
+Public ingress is disabled by default. No secrets, credentials, or access keys
+are accepted by the templates. Runtime access to dependencies uses managed
+identity with narrowly scoped RBAC. Private networking and Azure Policy remain
+deferred until a target landing-zone contract defines topology and ownership.

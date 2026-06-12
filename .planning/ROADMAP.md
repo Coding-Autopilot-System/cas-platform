@@ -13,18 +13,23 @@ through OPS-04, QUAL-01 through QUAL-04.
 3. Architecture and threat model accurately describe residual risk.
 4. Repository can be created publicly and CI can validate the foundation.
 
-## Phase 2: Network and Policy Guardrails
+## Phase 2: Reference Product Integration
+
+Implement the public reference product deployment contract: non-secret
+configuration, health probes, system-assigned identity boundaries, and
+optional project-scoped Foundry RBAC.
+
+## Phase 3: Network and Policy Guardrails
 
 Add private networking, controlled egress, Azure Policy, and compliance
-reporting after target subscription architecture is agreed.
+reporting only after target subscription architecture is agreed.
 
-## Phase 3: Federated Delivery
+## Phase 4: Federated Delivery
 
 Add OIDC/managed-identity deployment workflows, approvals, evidence retention,
 and safe promotion between environments.
 
-## Phase 4: Production Operations
+## Phase 5: Production Operations
 
 Add alerts, SLOs, dashboards, incident routing, release attestations, and
 recovery exercises.
-

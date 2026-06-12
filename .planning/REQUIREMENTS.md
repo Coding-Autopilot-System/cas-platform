@@ -35,6 +35,10 @@
 
 ## v2 Requirements
 
+- [x] **INT-01**: Platform injects the reference product non-secret configuration contract.
+- [x] **INT-02**: Platform configures reference product liveness and readiness probes.
+- [x] **INT-03**: Foundry RBAC is optional and requires explicit project scope and role definition inputs.
+- [x] **INT-04**: Contract tests prove workload identity, configuration, probes, ingress, and RBAC boundaries.
 - **NET-01**: Operator can enable private networking and controlled egress.
 - **GOV-01**: Operator can apply Azure Policy and compliance reporting.
 - **DEL-01**: Authorized workload identity can promote reviewed infrastructure.
@@ -57,9 +61,10 @@
 | SEC-01, SEC-02, SEC-03, SEC-04 | Phase 1 | Complete |
 | OPS-01, OPS-02, OPS-03, OPS-04 | Phase 1 | Complete |
 | QUAL-01, QUAL-02, QUAL-03, QUAL-04 | Phase 1 | Complete |
+| INT-01, INT-02, INT-03, INT-04 | Phase 2 | Complete |
+| NET-01, GOV-01 | Phase 3 | Pending landing-zone contract |
 
-**Coverage:** 16 v1 requirements, 16 mapped, 0 unmapped.
+**Coverage:** 16 v1 requirements and 4 integration requirements complete.
 
 ---
-*Last updated: 2026-06-11 after v0.1 foundation*
-
+*Last updated: 2026-06-12 after reference product integration*
