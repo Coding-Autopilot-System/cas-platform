@@ -33,6 +33,25 @@ param dataClassification string = 'internal'
 @description('Container image for the foundation workload.')
 param containerImage string
 
+@description('Workflow backend selected by the reference product.')
+@allowed([
+  'local'
+  'foundry'
+])
+param workflowBackend string = 'local'
+
+@description('Foundry project endpoint. Required by the application when workflowBackend is foundry.')
+param foundryProjectEndpoint string = ''
+
+@description('Foundry Next Gen agent name. Required by the application when workflowBackend is foundry.')
+param foundryAgentName string = ''
+
+@description('Optional explicit Foundry project resource identifier used as the narrow RBAC scope.')
+param foundryProjectResourceId string = ''
+
+@description('Optional explicit role definition resource identifier approved for the workload at the Foundry project scope.')
+param foundryRoleDefinitionResourceId string = ''
+
 @description('Whether the Container App accepts public network ingress.')
 param enableExternalIngress bool = false
 
@@ -48,6 +67,7 @@ param monthlyBudget int = 0
 param budgetContactEmails array = []
 
 var suffix = take(uniqueString(subscription().subscriptionId, workloadName, environment, location), 6)
+var enableFoundryRbac = !empty(foundryProjectResourceId) && !empty(foundryRoleDefinitionResourceId)
 var resourceGroupName = 'rg-${workloadName}-${environment}-${suffix}'
 var tags = {
   application: workloadName
@@ -87,9 +107,23 @@ module compute './modules/container-apps.bicep' = {
     location: location
     suffix: suffix
     containerImage: containerImage
+    workflowBackend: workflowBackend
+    foundryProjectEndpoint: foundryProjectEndpoint
+    foundryAgentName: foundryAgentName
+    applicationInsightsConnectionString: observability.outputs.applicationInsightsConnectionString
     enableExternalIngress: enableExternalIngress
     logAnalyticsWorkspaceId: observability.outputs.logAnalyticsWorkspaceId
     tags: tags
+  }
+}
+
+module foundryRbac './modules/foundry-rbac.bicep' = if (enableFoundryRbac) {
+  name: 'foundry-rbac-${environment}'
+  scope: resourceGroup(split(foundryProjectResourceId, '/')[2], split(foundryProjectResourceId, '/')[4])
+  params: {
+    workloadPrincipalId: compute.outputs.workloadPrincipalId
+    foundryProjectResourceId: foundryProjectResourceId
+    foundryRoleDefinitionResourceId: foundryRoleDefinitionResourceId
   }
 }
 
@@ -117,4 +151,3 @@ output logAnalyticsWorkspaceId string = observability.outputs.logAnalyticsWorksp
 
 @description('Application Insights resource identifier.')
 output applicationInsightsId string = observability.outputs.applicationInsightsId
-

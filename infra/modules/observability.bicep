@@ -53,3 +53,5 @@ output logAnalyticsWorkspaceId string = workspace.id
 @description('Application Insights resource identifier.')
 output applicationInsightsId string = applicationInsights.id
 
+@description('Non-secret Application Insights connection string injected into the workload.')
+output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString

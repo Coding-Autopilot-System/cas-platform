@@ -15,6 +15,17 @@ sets. Production deployment is intentionally not implemented in v0.1. Add it
 only after workload identity, approvals, policy, and rollback ownership are
 defined.
 
+## Reference product modes
+
+Parameter files default to `WORKFLOW_BACKEND=local`. To validate Foundry mode,
+provide the non-secret project endpoint and Next Gen agent name. RBAC remains
+disabled unless the operator also supplies both the exact Foundry project
+resource ID and an approved role definition resource ID. Review the resulting
+project-scoped role assignment in what-if before any deployment authorization.
+
+Health probes call `/health/live` and `/health/ready` on port 8080. Readiness
+checks configuration only; it does not invoke Foundry.
+
 ## Rollback
 
 Bicep redeployment can restore configuration but does not restore deleted data
@@ -26,4 +37,3 @@ Never rely on changing a resource name as a rollback mechanism.
 Query the environment Log Analytics workspace for platform and application
 logs. Application Insights is available for workload instrumentation when the
 application is configured without exposing credentials.
-
