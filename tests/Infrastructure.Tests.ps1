@@ -1,5 +1,8 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param()
+
 BeforeAll {
-    $repoRoot = Split-Path -Parent $PSScriptRoot
+    $repoRoot = Split-Path -Parent -Path $PSScriptRoot
     $main = Get-Content -Raw (Join-Path $repoRoot 'infra/main.bicep')
     $compute = Get-Content -Raw (Join-Path $repoRoot 'infra/modules/container-apps.bicep')
     $observability = Get-Content -Raw (Join-Path $repoRoot 'infra/modules/observability.bicep')
