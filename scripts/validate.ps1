@@ -50,5 +50,5 @@ finally {
     Pop-Location
 }
 
-Write-Host 'CAS platform validation passed.'
+Write-Output 'CAS platform validation passed.'
 
