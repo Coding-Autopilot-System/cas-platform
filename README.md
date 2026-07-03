@@ -1,5 +1,8 @@
 # CAS Platform
 
+[![CI](https://github.com/Coding-Autopilot-System/cas-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Autopilot-System/cas-platform/actions/workflows/ci.yml) [![CodeQL](https://github.com/Coding-Autopilot-System/cas-platform/actions/workflows/codeql.yml/badge.svg)](https://github.com/Coding-Autopilot-System/cas-platform/actions/workflows/codeql.yml)
+
+
 Production-oriented Azure infrastructure foundation for the Coding Autopilot
 System (CAS). It provides environment-isolated Container Apps hosting,
 workspace-based observability, system-assigned managed identity, budgets, and
