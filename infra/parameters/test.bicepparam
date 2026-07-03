@@ -13,5 +13,6 @@ param foundryProjectResourceId = ''
 param foundryRoleDefinitionResourceId = ''
 param enableExternalIngress = false
 param logRetentionDays = 30
+param allowObservabilityPublicNetworkAccess = false
 param monthlyBudget = 0
 param budgetContactEmails = []
