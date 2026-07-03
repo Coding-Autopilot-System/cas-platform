@@ -18,6 +18,11 @@ param retentionDays int
 @description('Common Azure resource tags.')
 param tags object
 
+@description('Allow public network access for observability ingestion and query. Secure default is false; individual environments (for example dev) may override to true.')
+param allowPublicNetworkAccess bool = false
+
+var publicNetworkAccess = allowPublicNetworkAccess ? 'Enabled' : 'Disabled'
+
 resource workspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
   name: 'log-${workloadName}-${environment}-${suffix}'
   location: location
@@ -27,8 +32,8 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
     features: {
       enableLogAccessUsingOnlyResourcePermissions: true
     }
-    publicNetworkAccessForIngestion: 'Enabled'
-    publicNetworkAccessForQuery: 'Enabled'
+    publicNetworkAccessForIngestion: publicNetworkAccess
+    publicNetworkAccessForQuery: publicNetworkAccess
   }
 }
 
@@ -42,8 +47,8 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
     WorkspaceResourceId: workspace.id
     DisableLocalAuth: true
     IngestionMode: 'LogAnalytics'
-    publicNetworkAccessForIngestion: 'Enabled'
-    publicNetworkAccessForQuery: 'Enabled'
+    publicNetworkAccessForIngestion: publicNetworkAccess
+    publicNetworkAccessForQuery: publicNetworkAccess
   }
 }
 

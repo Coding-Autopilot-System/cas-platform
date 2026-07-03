@@ -59,6 +59,9 @@ param enableExternalIngress bool = false
 @minValue(30)
 param logRetentionDays int = 30
 
+@description('Allow public network access to Log Analytics and Application Insights ingestion/query. Secure default is false; lower environments (for example dev) may override to true.')
+param allowObservabilityPublicNetworkAccess bool = false
+
 @description('Optional monthly resource-group budget. Set to zero to disable.')
 @minValue(0)
 param monthlyBudget int = 0
@@ -94,6 +97,7 @@ module observability './modules/observability.bicep' = {
     location: location
     suffix: suffix
     retentionDays: logRetentionDays
+    allowPublicNetworkAccess: allowObservabilityPublicNetworkAccess
     tags: tags
   }
 }
