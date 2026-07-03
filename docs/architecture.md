@@ -1,62 +1,92 @@
 # Architecture
 
-## Scope and ownership
+The CAS Platform infrastructure relies on a modular, subscription-scoped orchestration model built with Azure Bicep. It emphasizes environment isolation, strict identity boundaries, and comprehensive observability.
 
-`infra/main.bicep` is a subscription-scope orchestrator. It creates one resource
-group for a selected environment and delegates coherent concerns to
-resource-group-scoped modules.
+## System Architecture Diagram
 
-```text
-Subscription deployment
-  -> environment resource group
-     -> observability module
-        -> Log Analytics workspace
-        -> workspace-based Application Insights
-     -> compute module
-        -> Container Apps managed environment
-        -> Container App with system-assigned identity
-        -> Azure Monitor diagnostic settings
-     -> budget module (optional)
-        -> resource-group budget and notifications
+```mermaid
+flowchart TD
+    subgraph Subscription ["Azure Subscription"]
+        direction TB
+        Main[infra/main.bicep Orchestrator]
+        
+        subgraph RG ["Environment Resource Group (rg-cas-{env})"]
+            direction TB
+            
+            subgraph Observability ["Observability Module"]
+                LAW[Log Analytics Workspace]
+                AppInsights[Application Insights]
+                LAW --- AppInsights
+            end
+            
+            subgraph Compute ["Compute Module"]
+                CAE[Container Apps Environment]
+                CA[Container App Workload]
+                CAE --- CA
+            end
+            
+            subgraph Cost ["Cost Management Module (Optional)"]
+                Budget[Resource Group Budget]
+            end
+            
+            CA -->|Sends Telemetry| AppInsights
+            CA -->|Diagnostics Logs| LAW
+        end
+        
+        subgraph ExternalAuth ["External Authorization (Optional)"]
+            FoundryRBAC[Foundry RBAC Module]
+            FoundryProject[Foundry Project Resource]
+        end
+    end
+
+    Main -->|Deploys| RG
+    Main -->|Configures| Observability
+    Main -->|Configures| Compute
+    Main -->|Configures| Cost
+    Main -.->|Assigns Role| FoundryRBAC
+    
+    CA -->|System-Assigned Managed Identity| FoundryRBAC
+    FoundryRBAC -->|Grants Scoped Access| FoundryProject
 ```
 
-## Environment model
+## Scope and Ownership
 
-Dev, test, and production use the same module graph. Parameter files vary only
-approved values such as retention, workload sizing, ingress, and budget. Each
-environment receives a separate resource group, telemetry workspace, compute
-environment, identity boundary, and budget.
+`infra/main.bicep` acts as the subscription-scope orchestrator. It ensures the creation of a dedicated resource group for a specified environment (e.g., `dev`, `test`, `prod`) and delegates specific capabilities to resource-group-scoped modules.
 
-## Identity and networking
+## Environment Model
 
-The Container App receives a system-assigned managed identity. Foundry access
-is optional and creates no role assignment by default. When both an explicit
-Foundry project resource ID and an approved role definition resource ID are
-provided, the platform assigns that role only at the project resource scope.
-Subscription-wide workload roles are not supported.
+Dev, test, and production environments utilize the exact same module graph. Variations are handled purely through parameter files (e.g., log retention duration, workload sizing, ingress configuration, and budget limits). Each environment receives its own isolated:
+- Resource group
+- Telemetry workspace (Log Analytics & Application Insights)
+- Compute environment (Container Apps)
+- Identity boundary
+- Budget
 
-External ingress defaults to disabled. Enabling it is an explicit parameter
-decision and requires a threat-model review. The v0.1 baseline does not claim
-private networking. That topology remains deferred until a target landing-zone
-contract identifies required subnets, DNS, firewall, and egress ownership.
+## Identity and Networking
 
-## Reference product contract
+The core workload (Container App) relies exclusively on a **system-assigned managed identity**. 
 
-The workload module follows the public `cas-reference-product` deployment
-interface: Linux container image, port 8080, internal ingress by default,
-system-assigned identity, `/health/live` and `/health/ready` probes, and
-non-secret workload configuration. Application Insights configuration is
-injected directly from the observability module.
+* **Foundry Access:** This access is completely optional and disabled by default. If an explicit Foundry project resource ID and role definition are provided, the platform assigns that specific role *only* at the project scope. There are no subscription-wide assignments.
+* **Networking:** External ingress is disabled by default. Enabling it requires an explicit parameter override and threat-model review. Private networking is currently deferred until a target landing-zone contract is established.
+
+## Reference Product Contract
+
+The workload module is designed to implement the public `cas-reference-product` deployment interface:
+* Deploys a Linux container image on port `8080`.
+* Ingress is internal by default.
+* Expects `/health/live` and `/health/ready` probe endpoints.
+* Workload configuration is non-secret and injected at runtime.
+* Application Insights connection strings are injected securely directly from the observability module outputs.
 
 ## Observability
 
-Platform and application diagnostic settings send all supported logs and
-metrics to the environment Log Analytics workspace. Application Insights is
-workspace-based. No workspace shared keys or instrumentation connection strings
-are output.
+Diagnostic settings for both platform components and the application workload are configured to forward all supported logs and metrics into the environment's Log Analytics workspace. Application Insights is strictly workspace-based, meaning no legacy shared keys are utilized.
 
-## Change safety
+## Change Safety
 
-Normal changes flow through build, lint, contract tests, and subscription
-`what-if`. Resource naming is deterministic. Renaming workload, environment, or
-location can replace resource boundaries and must be treated as a migration.
+Infrastructure updates are managed via a strict pipeline:
+1. Linting and contract tests.
+2. Subscription-level `what-if` validation.
+3. Explicit deployment authorization.
+
+**Note on Naming:** Resource naming is deterministic based on subscription, workload name, environment, and region. Changing any of these core parameters will result in the replacement of resource boundaries and must be executed as a carefully planned migration.
