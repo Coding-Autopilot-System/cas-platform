@@ -1,11 +1,8 @@
-## Outcome
+## Description
+<!-- Describe your changes -->
 
-## Security and operational impact
-
-## Validation
-
-- [ ] `./scripts/validate.ps1`
-- [ ] Azure what-if reviewed when infrastructure behavior changes
-- [ ] No secrets or tenant-specific values committed
-- [ ] Documentation and threat model updated
-
+## SDLC Verification
+- [ ] Code follows CAS architecture (`AGENTS.md`)
+- [ ] Tested via `gsd-verify-work`
+- [ ] No embedded secrets or credentials
+- [ ] Passed `gsd-code-review`
