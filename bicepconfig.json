@@ -33,7 +33,7 @@
         "simplify-interpolation": { "level": "warning" },
         "simplify-json-null": { "level": "warning" },
         "use-parent-property": { "level": "warning" },
-        "use-recent-api-versions": { "level": "off" },
+        "use-recent-api-versions": { "level": "warning" },
         "use-resource-id-functions": { "level": "warning" },
         "use-resource-symbol-reference": { "level": "warning" },
         "use-safe-access": { "level": "warning" },
