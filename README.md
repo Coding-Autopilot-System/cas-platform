@@ -58,11 +58,23 @@ Foundry RBAC is disabled unless both `foundryProjectResourceId` and
 created only at that Foundry project resource. Select and approve the minimum
 role externally; the template does not assume a broad built-in role.
 
+## Validation and Linting
+
+Bicep linting is configured via [`bicepconfig.json`](bicepconfig.json), which enables the
+`core` analyzer ruleset. Rules covering secrets (`secure-secrets-in-params`,
+`outputs-should-not-contain-secrets`, `protect-commandtoexecute-secrets`), hardcoded
+environment URLs, and other correctness checks are set to `error`. The `use-recent-api-versions`
+rule — which pins resource API versions to recent, supported values — is currently `off` in
+`bicepconfig.json` on `main`; enabling it and pinning the stale API versions it flags is tracked
+in an open PR (`fix: enable use-recent-api-versions bicep lint rule`, PR #11). Once merged, this
+section will describe the rule as enabled rather than in progress.
+
 ## Architecture
 
 See [architecture](docs/architecture.md), [threat model](docs/threat-model.md),
 and [operations](docs/operations.md). Planning and requirement traceability are
-kept under `.planning/`.
+kept under `.planning/`. For a docs-as-code wiki (Home, Architecture, Operations, Decisions),
+see [`docs/wiki/`](docs/wiki/Home.md).
 
 ## Security
 
@@ -70,3 +82,13 @@ Public ingress is disabled by default. No secrets, credentials, or access keys
 are accepted by the templates. Runtime access to dependencies uses managed
 identity with narrowly scoped RBAC. Private networking and Azure Policy remain
 deferred until a target landing-zone contract defines topology and ownership.
+
+## Deployment lock
+
+This repository is maintained **bicep-ready** — linted, parameterized, and (once PR #11 lands)
+pinned to recent API versions — but is not deployed. Azure deployment is locked workspace-wide
+until a future milestone is deliberately reached; only local and CI `what-if` validation
+(`az deployment sub what-if`, invoked by `scripts/what-if.ps1`) runs against a live subscription,
+and that command never creates or modifies resources.
+
+<!-- docs-verified: c1585ee195b72c5282f278c98da28c60da75667c 2026-07-08 -->
