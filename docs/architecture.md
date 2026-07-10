@@ -4,6 +4,8 @@ The CAS Platform infrastructure relies on a modular, subscription-scoped orchest
 
 ## System Architecture Diagram
 
+![Visual Diagram](assets/cas_platform_architecture.png)
+
 ```mermaid
 flowchart TD
     subgraph Subscription ["Azure Subscription"]
