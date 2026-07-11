@@ -1,5 +1,7 @@
 # Architecture
 
+![Architecture Diagram](assets/arch.png)
+
 `cas-platform` is a modular, subscription-scoped Bicep orchestration model with environment
 isolation, a strict system-assigned-managed-identity boundary, and workspace-based
 observability. The workload module implements the public `cas-reference-product` deployment
