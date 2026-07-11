@@ -6,3 +6,9 @@
 *.whatif.txt
 infra/main.json
 
+
+.tmp-gh-*.ps1
+
+.tmp-venv*/
+
+TestResults/
